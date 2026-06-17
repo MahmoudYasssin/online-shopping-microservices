@@ -1,0 +1,88 @@
+server:
+  port: 3031
+
+spring:
+  application:
+    name: "order-service"
+    cloud:
+      openfeign:
+        client:
+          config:
+            inventory-service:
+              connectTimeout: 2000   # 2 sec to connect
+              readTimeout: 3000      # 3 sec to get response
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/orderdb
+    username: root
+    password: 30201022300911/*-+
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  sql:
+    init:
+      mode: always
+eureka:
+ # instance:
+  #  prefer-ip-address: true  # register in eureka server using ip address not using hostname
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory: #Circuit Breaker instance name.
+        sliding-window-size: 10 #Look at the last 10 requests.
+        minimum-number-of-calls: 5 #Don't calculate failures until at least 5 requests happened.
+        failure-rate-threshold: 50 #If more than 50% fail → OPEN circuit.
+        wait-duration-in-open-state: 30s #Stay OPEN for 30 seconds
+        permitted-number-of-calls-in-half-open-state: 3 #Allow 3 test requests during HALF-OPEN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+
+
+  # 5. Readiness State check --> Is the application ready to receive requests?
+  #Example:
+
+  #DB connected?
+  #app initialized?
+  #dependencies available?
+
+  #?Is the application still alive??
+  #If the app becomes stuck or dead:
+  #Kubernetes/Docker can restart it automatically.
+
+
+  health:
+    circuitbreakers:
+        enabled: true
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  #This enables special health endpoints for cloud/container systems.

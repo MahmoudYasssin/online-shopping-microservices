@@ -1,0 +1,42 @@
+server:
+  port: 3030
+
+spring:
+  application:
+    name: "product-service"
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/productdb
+    username: root
+    password: 30201022300911/*-+
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  sql:
+    init:
+      mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+  endpoint:
+    health:
+      show-details: always
+
+
+eureka:
+  instance:
+    prefer-ip-address: true  # register in eureka server using ip address not using hostname
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

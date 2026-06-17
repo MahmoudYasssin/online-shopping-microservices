@@ -1,0 +1,40 @@
+#Eureka server port
+server:
+  port: 8761
+
+#Spring boot app name
+spring:
+  application:
+    name: "eurekaserver"
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+#Actuatot
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  # 5. Readiness State check --> Is the application ready to receive requests?
+  #Example:
+
+  #DB connected?
+  #app initialized?
+  #dependencies available?
+
+  #?Is the application still alive??
+  #If the app becomes stuck or dead:
+  #Kubernetes/Docker can restart it automatically.
+
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  #This enables special health endpoints for cloud/container systems.
+  endpoint:
+    health:
+      show-details: always

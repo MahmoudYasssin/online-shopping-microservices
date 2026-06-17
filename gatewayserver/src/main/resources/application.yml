@@ -1,0 +1,77 @@
+# The port on which the API Gateway will run
+server:
+  port: 8072
+
+spring:
+  application:
+    # Service name registered in Eureka
+    name: gatewayserver
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # Automatically create routes for services found in Eureka
+          enabled: true
+
+          # Convert service names to lowercase URLs
+          # Example:
+          # PRODUCT-SERVICE -> /product-service/**
+          lower-case-service-id: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak endpoint containing public keys used
+          # to validate incoming JWT access tokens
+          jwk-set-uri: http://localhost:8081/realms/outh2-demo-realm/protocol/openid-connect/certs
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose all actuator endpoints
+        # Examples:
+        # /actuator
+        # /actuator/health
+        # /actuator/info
+        # /actuator/gateway/routes
+        include: "*"
+
+  endpoint:
+    gateway:
+      # Allow access to Gateway actuator endpoints
+      # such as /actuator/gateway/routes
+      access: unrestricted
+
+  info:
+    env:
+      # Include environment information in
+      # the /actuator/info endpoint
+      enabled: true
+
+eureka:
+  instance:
+    # Register the service using its IP address
+    # instead of hostname
+    prefer-ip-address: true
+
+  client:
+    # Register this Gateway service with Eureka
+    register-with-eureka: true
+
+    # Download the registry of all services
+    # from Eureka
+    fetch-registry: true
+
+    service-url:
+      # URL of the Eureka Server
+      defaultZone: http://localhost:8761/eureka/
+
+info:
+  app:
+    # Custom application information
+    # visible through /actuator/info
+    name: Gateway Server
+    description: API Gateway Server
+    version: 1.0.0

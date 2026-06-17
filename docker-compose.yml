@@ -1,0 +1,210 @@
+services:
+
+
+  broker:
+    image: confluentinc/cp-kafka:latest
+    container_name: broker
+
+    ports:
+      - "9092:9092"
+    networks:
+      - ybank
+
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+
+    ports:
+      - "8086:8080"
+
+    depends_on:
+      - broker
+    networks:
+      - ybank
+
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:9092
+  prometheus:
+    image: prom/prometheus:v2.37.1
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana-oss:8.5.2
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+
+
+    #####
+  #eurekaserver:
+  #  image: "mahmudyassin/eurekaserver:s1"
+  #  container_name: eurekaserver-ms
+  #  ports:
+  #    - "8761:8761"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 700m
+  #  networks:
+  #    - ybank
+
+  #inventory-service:
+  #  image: "mahmudyassin/inventory-service:s1"
+  #  container_name: inventory-ms
+  #  ports:
+  #    - "3032:3032"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 700m
+  #  networks:
+  #    - ybank
+  #  depends_on:
+  #    inventorydb:
+  #      condition: service_healthy
+
+ # notification-service:
+ #   image: "mahmudyassin/notification-service:s1"
+ #   container_name: notification-ms
+ #   ports:
+ #     - "3033:3033"
+ #   deploy:
+ #     resources:
+ #       limits:
+ #         memory: 700m
+ #   networks:
+ #     - ybank
+
+
+
+  #order-service:
+  #  image: "mahmudyassin/order-service:s1"
+  #  container_name: order-ms
+  #  ports:
+  #    - "3031:3031"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 700m
+  #  networks:
+  #    - ybank
+  #  depends_on:
+  #    orderdb:
+  #      condition: service_healthy
+
+#  product-service:
+#    image: "mahmudyassin/product-service:s1"
+#    container_name: product-ms
+#    ports:
+#      - "3030:3030"
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 700m
+#   networks:
+#      - ybank
+
+ #   depends_on:
+ #     productdb:
+ #       condition: service_healthy
+
+  #gatewayserver:
+  #  image: "mahmudyassin/gatewayserver:s1"
+  #  container_name: gateway-ms
+  #  ports:
+  #    - "8072:8072"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 700m
+  #  networks:
+  #    - ybank
+  #  depends_on:
+  #    - eurekaserver
+
+  #inventorydb:
+  #  image: mysql
+  #  container_name: inventorydb
+  #  ports:
+  #    - "3307:3306"
+  #  healthcheck:
+  #    test: [ "CMD","mysqladmin","ping","-h","localhost" ]
+  #    timeout: 10s
+  #    retries: 10
+  #    interval: 10s
+  #    start_period: 10s
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: 30201022300911/*-+
+  #    MYSQL_DATABASE: inventorydb
+  #  networks:
+  #    - ybank
+
+  #orderdb:
+  #  image: mysql
+  #  container_name: orderdb
+  #  ports:
+  #    - "3308:3306"
+  #  healthcheck:
+   #   test: [ "CMD","mysqladmin","ping","-h","localhost" ]
+   #   timeout: 10s
+   #   retries: 10
+   #   interval: 10s
+   #   start_period: 10s
+   # environment:
+   #   MYSQL_ROOT_PASSWORD: 30201022300911/*-+
+   #   MYSQL_DATABASE: orderdb
+   # networks:
+   #   - ybank
+
+  #productdb:
+  #  image: mysql
+  #  container_name: productdb
+  #  ports:
+  #    - "3309:3306"
+  #  healthcheck:
+  #    test: [ "CMD","mysqladmin","ping","-h","localhost" ]
+  #    timeout: 10s
+  #    retries: 10
+  #    interval: 10s
+  #   start_period: 10s
+  # environment:
+   #   MYSQL_ROOT_PASSWORD: 30201022300911/*-+
+   #   MYSQL_DATABASE: productdb
+   # networks:
+   #   - ybank
+networks:
+  ybank:
+    driver: bridge
+
+  ## Prometheus
+
+
+
+

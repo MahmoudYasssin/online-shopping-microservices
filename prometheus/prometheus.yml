@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: 'product_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:3030']
+        labels:
+          application: 'Product Service Application'
+
+  - job_name: 'order_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:3031']
+        labels:
+          application: 'Order Service Application'
+
+  - job_name: 'inventory_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:3032']
+        labels:
+          application: 'Inventory Service Application'
+
+  - job_name: 'notification_service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:3033' ]
+        labels:
+          application: 'notification Service Application'
+
+
+  - job_name: 'gatewayserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8072']
+        labels:
+          application: 'Gateway Server'
